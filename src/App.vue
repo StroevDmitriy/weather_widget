@@ -1,15 +1,30 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <!-- <MDBBtn color="success">Success</MDBBtn> -->
+  
+  <Settings>
+    <button>
+      <MDBIcon icon="cog" iconStyle="fas" />
+    </button>
+  </Settings>
+
+  <CityInfo>
+    
+  </CityInfo>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+// import { MDBBtn } from "mdb-vue-ui-kit";
+import { MDBIcon } from "mdb-vue-ui-kit";
+import CityInfo from './components/CityInfo.vue'
+import Settings from './components/Settings.vue'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    // MDBBtn,
+    MDBIcon,
+    CityInfo,
+    Settings
   }
 }
 </script>
