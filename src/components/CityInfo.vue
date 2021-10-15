@@ -2,7 +2,9 @@
     <div class="city-card">
         <h2>City Info Component</h2>
         <div class="location">
-            <span class="city">City name</span>, 
+            <span class="city">
+                {{ city.name }}
+            </span>, 
             <span class="country">Country code</span>
         </div>
         <div class="main-info">
@@ -23,7 +25,11 @@
 
 <script>
     export default {
-        
+        props: {
+            city: {
+                type: Object,
+            }
+        },
     }
 </script>
 

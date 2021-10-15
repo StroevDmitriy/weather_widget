@@ -1,12 +1,15 @@
 <template>
-    <div class="settings-row">
+    <div class="settings-panel">
         <div class="settings-card">
             <h3>Settings</h3>
 
             <ul class="current-cities">
                 <li>
                     <h4>London, UK</h4>
-                    <button type="button"><MDBIcon icon="trash" iconStyle="fas" /></button>
+                    <button type="button">
+                        <MDBIcon icon="trash" iconStyle="fas" />
+                        <!-- <MDBIcon fas icon="times" /> -->
+                    </button>
                 </li>
                 <li>
                     <h4>Moscow, RU</h4>
@@ -18,10 +21,6 @@
                 <input type="text" placeholder="New York">
             </div>
         </div>
-        
-        <button class="open-settings" type="button">
-            <MDBIcon icon="cog" iconStyle="fas" />
-        </button>
     </div>
 </template>
 
@@ -30,14 +29,22 @@
     export default {
         components: {
             MDBIcon,
-        }
+        },
+        methods: {
+
+        },
     }
 </script>
 
 <style lang="scss" scoped>
-.settings-row{
+.settings-panel{
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-color: #fff;
+    top: 50px;
 }
 .open-settings{
     width: 32px;
