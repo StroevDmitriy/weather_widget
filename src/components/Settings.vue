@@ -6,14 +6,33 @@
                 <li draggable="true" v-for="(city, id) in cityList" :key="id">
                     <button class="dnd"><MDBIcon fas icon="bars" /></button>
                     <h4>{{ city.name }}</h4>
-                    <button type="button" class="remove-btn" @click="$emit('removeCity', id)">
-                        <MDBIcon icon="trash" iconStyle="fas" />
+                    <button
+                        type="button"
+                        class="remove-btn"
+                        @click="$emit('removeCity', id), clearSearch()"
+                    ><MDBIcon icon="trash" iconStyle="fas" />
                     </button>
                 </li>
             </ul>
             <div class="add-location">
-                <h3>Add location: {{ citySearch }}</h3>
-                <input type="text" placeholder="New York" v-model="citySearch">
+                <h3>Add location:</h3>
+                <div class="search-block">
+                    <div class="search-block__input-n-result">
+                        <input
+                            class="city-search"
+                            type="text"
+                            placeholder="New York"
+                            v-model="citySearch">
+                        <div class="suggest visible" v-if="foundCity">
+                            <span>{{ foundedCityName }}</span>
+                        </div>
+                    </div>
+
+                    <button
+                        class="search-btn"
+                        @click="$emit('addCity', foundCity.name), clearSearch()"
+                    ><MDBIcon fas icon="level-down-alt"/></button>
+                </div>
             </div>
         </div>
     </div>
@@ -34,35 +53,55 @@
             return{
                 citySearch: null,
                 timerId: null,
+                foundCity: null,
+                // suggestVisibility: false,
             }
         },
-        emits: ['removeCity'],
+        computed: {
+            foundedCityName() {
+                console.log(this.foundCity);
+                if (this.foundCity.name && this.foundCity.sys.country) {
+                    return `${this.foundCity.name}, ${this.foundCity.sys.country}`;
+                } else {
+                    return 'Not found';
+                }
+            },
+        },
+        emits: ['removeCity', 'addCity'],
         components: {
             MDBIcon,
         },
         methods: {
-
+            clearSearch() {
+                this.citySearch = null;
+                this.foundCity = null;
+                // this.suggestVisibility = false;
+            }
         },
         watch: {
-            citySearch(newValue, oldValue, ) {
+            citySearch(newValue, ) {
+                // console.log(newValue);
                 clearTimeout(this.timerId);
 
-                let apiKey = this.apiKey
-                this.timerId = setTimeout(function() {
-                    console.log(`http://api.openweathermap.org/data/2.5/weather?q=${newValue}&appid=${apiKey}&units=metric`);
-                    console.log(newValue, oldValue);
-                }, 1500);
-
+                if (newValue == '') {
+                    this.foundCity = null;
+                } else {
+                    let ctxt = this;
+                    this.timerId = setTimeout(function() {
+                        fetch(`http://api.openweathermap.org/data/2.5/weather?q=${newValue}&appid=${ctxt.apiKey}&units=metric`)
+                            .then(response => response.json())
+                            .then(function (result) {
+                                ctxt.foundCity = result;
+                                ctxt.suggestVisibility = true;
+                            })
+                            .catch(error => {
+                                console.log('Error!!!');
+                                console.error('Add city error: ', error);
+                                ctxt.foundCity = null;
+                            });
+                    }, 1500);
+                }
                 
-                // `http://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}&units=metric`
-
-                // fetch(`http://api.openweathermap.org/data/2.5/weather?q=${newValue}&appid=${this.apiKey}&units=metric`)
-                //     .then(response => response.json())
-                //     .then(result => {
-                    //     this.cityList.push(result);
-
-                //     console.log(result);
-                //     })
             },
         },
     }
@@ -99,7 +138,6 @@
         width: 100%;
         margin: 8px 0px;
         padding: 10px 8px;
-        // justify-content: space-between;
         background-color: #eee;
     }
 }
@@ -112,5 +150,41 @@
     border: none;
     background: none;
     margin-left: auto;
+}
+.search-block{
+    display: flex;
+    align-items: flex-start;
+
+    &__input-n-result{
+        position: relative;
+        margin-right: 10px;
+        margin-bottom: 36px;
+    }
+}
+.city-search{
+    width: 100%;
+}
+.suggest{
+    position: absolute;
+    display: none;
+    width: 100%;
+    height: 36px;
+    top: 100%;
+    left: 0;
+    align-items: center;
+    padding: 6px;
+    border: 1px solid red;
+    border-top: none;
+}
+.city-search:focus + .suggest{
+    display: flex;
+}
+.search-btn{
+    background: none;
+    border: none;
+
+    .fas{
+        transform: rotate(90deg);
+    }
 }
 </style>

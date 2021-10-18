@@ -16,10 +16,10 @@
             <span>Feels like {{ Math.round(city.main.feels_like) }}°</span>. <span>{{ city.weather[0].main }}</span>.
         </p>
         <div class="details">
-            <div class="wind-direction"><span><MDBIcon fas icon="location-arrow" /></span> {{ Math.round(this.city.wind.speed * 10) / 10 }} m/s {{ windDirection }}</div>
-            <div class="pressure"><span><MDBIcon far icon="compass" /></span> {{ city.main.pressure }} hPa</div>
-            <div class="humidity">Humidity: {{ city.main.humidity }}%</div>
-            <div class="visibility">Visibility: {{(Math.round(city.visibility / 100) / 10).toFixed(1)}} km</div>
+            <div class="details__item wind-direction"><span><MDBIcon fas icon="location-arrow" /></span> {{ Math.round(this.city.wind.speed * 10) / 10 }} m/s {{ windDirection }}</div>
+            <div class="details__item pressure"><span><MDBIcon far icon="compass" /></span> {{ city.main.pressure }} hPa</div>
+            <div class="details__item humidity">Humidity: {{ city.main.humidity }}%</div>
+            <div class="details__item visibility">Visibility: {{(Math.round(city.visibility / 100) / 10).toFixed(1)}} km</div>
         </div>
     </div>
 </template>
@@ -84,5 +84,10 @@ h3{
     display: flex;
     flex-flow: wrap;
     justify-content: space-between;
+
+    &__item{
+        width: 50%;
+        text-align: left;
+    }
 }
 </style>
