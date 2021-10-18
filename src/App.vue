@@ -78,7 +78,7 @@ export default {
 
     //Add another cities
     this.addCity('Moscow');
-    this.addCity('London');
+    this.addCity('Saint Petersburg');
   }
 }
 </script>
