@@ -6,7 +6,7 @@
         <MDBIcon fas icon="times" v-else/>
     </button>
 
-    <Settings v-show="settingsVisible">
+    <Settings :cityList="cityList" :apiKey="apiKey" v-show="settingsVisible" @removeCity="removeCity">
       <button>
         <!-- <MDBIcon icon="cog" iconStyle="fas" /> -->
         
@@ -47,28 +47,30 @@ export default {
     openSettings() {
       this.settingsVisible = !this.settingsVisible;
     },
-    setupDefault() {
-      // api.openweathermap.org/data/2.5/weather?q={city name}&appid=${this.APIkey}
-    },
     createUrl(cityName, apiKey) {
-      return `http://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}`
+      return `http://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}&units=metric`
     },
     addCity(cityName) {
       this.cityList = new Array;
+      console.log( this.createUrl(cityName, this.apiKey) );
       fetch(this.createUrl(cityName, this.apiKey))
         .then(response => response.json())
         .then(result => {
           this.cityList.push(result);
 
-          // console.log(result);
+          console.log(result);
         })
         .catch(error => console.log('Add city error: ', error));
-    }
+    },
+    removeCity(idx) {
+      this.cityList.splice(idx, 1);
+    },
   },
   created() {
     this.cityList = new Array;
     this.addCity('Moscow');
     this.addCity('London');
+    this.addCity('Oshkosh');
   }
 }
 </script>
