@@ -1,23 +1,15 @@
 <template>
-  <!-- <MDBBtn color="success">Success</MDBBtn> -->
   <div class="app-container">
     <button class="open-settings" type="button" @click="openSettings">
         <MDBIcon icon="cog" iconStyle="fas" v-if="!settingsVisible"/>
         <MDBIcon fas icon="times" v-else/>
     </button>
 
-    <Settings :cityList="cityList" :apiKey="apiKey" v-show="settingsVisible" @removeCity="removeCity" @addCity="addCity">
-      <button>
-        <!-- <MDBIcon icon="cog" iconStyle="fas" /> -->
-        
-      </button>
-    </Settings>
+    <Settings :cityList="cityList" :apiKey="apiKey" v-show="settingsVisible" @removeCity="removeCity" @addCity="addCity" />
 
     <template v-for="(city,id) in cityList" :key="id">
       <CityInfo :city="city"/>  
     </template>
-    
-    <!-- <CityInfo /> -->
   </div>
 </template>
 
@@ -58,8 +50,7 @@ export default {
         .then(response => response.json())
         .then(result => {
           this.cityList.push(result);
-        })
-        .catch(error => console.log('Add city error: ', error));
+        });
     },
     removeCity(idx) {
       this.cityList.splice(idx, 1);
@@ -67,6 +58,25 @@ export default {
   },
   created() {
     this.cityList = new Array;
+
+    //Add current geoposition
+    let ctxt = this;
+    navigator.geolocation.getCurrentPosition(success, error, {enableHighAccuracy: true})
+
+    function success({ coords }) {
+      const { latitude, longitude } = coords
+      fetch(`http://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${ctxt.apiKey}&units=metric`)
+        .then(response => response.json())
+        .then(result => {
+          ctxt.cityList.push(result);
+        });
+    }
+
+    function error({ message }) {
+      console.log(message) // if access denied get PositionError: User denied Geolocation
+    }
+
+    //Add another cities
     this.addCity('Moscow');
     this.addCity('London');
   }

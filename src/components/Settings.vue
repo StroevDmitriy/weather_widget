@@ -9,7 +9,7 @@
                     <button
                         type="button"
                         class="remove-btn"
-                        @click="$emit('removeCity', id), clearSearch()"
+                        @click="$emit('removeCity', id)"
                     ><MDBIcon icon="trash" iconStyle="fas" />
                     </button>
                 </li>
@@ -54,13 +54,12 @@
                 citySearch: null,
                 timerId: null,
                 foundCity: null,
-                // suggestVisibility: false,
             }
         },
         computed: {
             foundedCityName() {
                 console.log(this.foundCity);
-                if (this.foundCity.name && this.foundCity.sys.country) {
+                if (this.foundCity !== null && this.foundCity.name && this.foundCity.sys.country) {
                     return `${this.foundCity.name}, ${this.foundCity.sys.country}`;
                 } else {
                     return 'Not found';
@@ -75,12 +74,10 @@
             clearSearch() {
                 this.citySearch = null;
                 this.foundCity = null;
-                // this.suggestVisibility = false;
             }
         },
         watch: {
-            citySearch(newValue, ) {
-                // console.log(newValue);
+            citySearch(newValue) {
                 clearTimeout(this.timerId);
 
                 if (newValue == '') {
@@ -88,20 +85,15 @@
                 } else {
                     let ctxt = this;
                     this.timerId = setTimeout(function() {
+
                         fetch(`http://api.openweathermap.org/data/2.5/weather?q=${newValue}&appid=${ctxt.apiKey}&units=metric`)
                             .then(response => response.json())
                             .then(function (result) {
                                 ctxt.foundCity = result;
                                 ctxt.suggestVisibility = true;
-                            })
-                            .catch(error => {
-                                console.log('Error!!!');
-                                console.error('Add city error: ', error);
-                                ctxt.foundCity = null;
                             });
                     }, 1500);
                 }
-                
             },
         },
     }
@@ -173,7 +165,7 @@
     left: 0;
     align-items: center;
     padding: 6px;
-    border: 1px solid red;
+    background-color: #dedede;
     border-top: none;
 }
 .city-search:focus + .suggest{
