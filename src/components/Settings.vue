@@ -1,6 +1,6 @@
 <template>
     <div class="settings-panel">
-        <div class="settings-card">
+        <!-- <div class="settings-card"> -->
             <h3>Settings</h3>
             <ul class="current-cities">
                 <li draggable="true" v-for="(city, id) in cityList" :key="id">
@@ -23,18 +23,19 @@
                             type="text"
                             placeholder="New York"
                             v-model="citySearch">
-                        <div class="suggest visible" v-if="foundCity">
+                        <div class="suggest visible" v-if="suggestVisible">
                             <span>{{ foundedCityName }}</span>
                         </div>
                     </div>
 
                     <button
-                        class="search-btn"
+                        class="add-city-btn"
+                        :class="{'disabled': btnAddDisabled, 'yee': true}"
                         @click="$emit('addCity', foundCity.name), clearSearch()"
                     ><MDBIcon fas icon="level-down-alt"/></button>
                 </div>
             </div>
-        </div>
+        <!-- </div> -->
     </div>
 </template>
 
@@ -54,11 +55,12 @@
                 citySearch: null,
                 timerId: null,
                 foundCity: null,
+                suggestVisible: false,
+                btnAddDisabled: false,
             }
         },
         computed: {
             foundedCityName() {
-                console.log(this.foundCity);
                 if (this.foundCity !== null && this.foundCity.name && this.foundCity.sys.country) {
                     return `${this.foundCity.name}, ${this.foundCity.sys.country}`;
                 } else {
@@ -73,7 +75,7 @@
         methods: {
             clearSearch() {
                 this.citySearch = null;
-                this.foundCity = null;
+                this.suggestVisible = false;
             }
         },
         watch: {
@@ -81,18 +83,25 @@
                 clearTimeout(this.timerId);
 
                 if (newValue == '') {
-                    this.foundCity = null;
+                    this.suggestVisible = null;
                 } else {
                     let ctxt = this;
-                    this.timerId = setTimeout(function() {
+                    this.btnAddDisabled = true;
+                    this.suggestVisible = false;
+                    this.timerId = setTimeout(async function() {
+                        let response = await fetch(`http://api.openweathermap.org/data/2.5/weather?q=${newValue}&appid=${ctxt.apiKey}&units=metric`)
 
-                        fetch(`http://api.openweathermap.org/data/2.5/weather?q=${newValue}&appid=${ctxt.apiKey}&units=metric`)
-                            .then(response => response.json())
-                            .then(function (result) {
-                                ctxt.foundCity = result;
-                                ctxt.suggestVisibility = true;
-                            });
-                    }, 1500);
+                        if (response.ok) {
+                            let result = await response.json();
+
+                            ctxt.foundCity = result;
+                            ctxt.btnAddDisabled = false;
+                        }
+                        else {
+                            ctxt.foundCity = null;
+                        }
+                        ctxt.suggestVisible = true;
+                    }, 500);
                 }
             },
         },
@@ -102,19 +111,17 @@
 <style lang="scss" scoped>
 .settings-panel{
     display: flex;
-    justify-content: center;
-    position: absolute;
+    flex-flow: column;
+    padding: 15px;
     height: 100%;
     width: 100%;
-    background-color: #fff;
     top: 50px;
-}
-.open-settings{
-    width: 32px;
-    height: 32px;
-}
-.settings-card{
-    padding: 15px;
+    justify-content: center;
+    padding-bottom: 60px;
+    background-color: #fff;
+
+    border-radius: 20px;
+    border: 1px solid #000;
 }
 .current-cities{
     padding-left: 0px;
@@ -171,9 +178,14 @@
 .city-search:focus + .suggest{
     display: flex;
 }
-.search-btn{
+.add-city-btn{
     background: none;
     border: none;
+
+    &.disabled{
+        opacity: .5;
+        pointer-events: none;
+    }
 
     .fas{
         transform: rotate(90deg);
